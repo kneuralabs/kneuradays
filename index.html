@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Kneuralabs Intranet · Trust & Security</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #000;
+      color: #e5e9f0;
+      line-height: 1.5;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      min-height: 100dvh;
+      max-width: 1320px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      /* Safe area insets: notch + home indicator */
+      padding-top:    max(1.1rem, env(safe-area-inset-top));
+      padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+      padding-left:   max(1rem,   env(safe-area-inset-left));
+      padding-right:  max(1rem,   env(safe-area-inset-right));
+    }
+
+    /* ── Header ── */
+    .header {
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .header h1 {
+      font-size: clamp(1.55rem, 5vw, 2.6rem);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    .dateline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-top: 0.35rem;
+      padding-top: 0.35rem;
+      border-top: 1px solid rgba(255,165,89,0.4);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #555;
+    }
+    .edition {
+      color: #FFA559;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    /* Small phones: show only time, hide full date */
+    #ts-short { display: none; }
+    @media (max-width: 430px) {
+      #ts-long  { display: none; }
+      #ts-short { display: inline; }
+    }
+
+    /* ── Layout: single column on mobile ── */
+    .layout {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ── Message column ── */
+    .msg-col { /* natural height on mobile */ }
+
+    .msg-heading {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.65rem;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+    }
+    .msg-body {
+      font-size: 0.83rem;
+      line-height: 1.7;
+      color: #888;
+    }
+    .msg-body p { margin-bottom: 0.65rem; }
+    .msg-body p:last-child { margin-bottom: 0; }
+    .sig {
+      margin-top: 1rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid #FFA559;
+    }
+    .sig-name  { font-size: 0.82rem; font-weight: 700; color: #FFA559; }
+    .sig-title { font-size: 0.68rem; color: #555; margin-top: 3px; }
+
+    /* ── Tile grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .tile {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 4 / 3;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    /* Touch active feedback */
+    .tile:active { transform: scale(0.96); filter: brightness(0.78); }
+    /* Mouse hover (desktop only) */
+    @media (hover: hover) {
+      .tile:hover { transform: scale(0.97); filter: brightness(0.82); }
+    }
+
+    .tile-primary { background: #C84B38; }
+    .tile-c1 { background: #141d1a; border: 0.5px solid rgba(29,158,117,0.2); }
+    .tile-c2 { background: #1a1520; border: 0.5px solid rgba(127,119,221,0.2); }
+    .tile-c3 { background: #1a1710; border: 0.5px solid rgba(186,117,23,0.2); }
+    .tile-c4 { background: #10181d; border: 0.5px solid rgba(55,138,221,0.2); }
+    .tile-c5 { background: #1a1214; border: 0.5px solid rgba(212,83,126,0.2); }
+
+    .tile-inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+      color: inherit;
+    }
+    .tile-name {
+      font-size: clamp(0.88rem, 3.5vw, 1.25rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .tile-desc {
+      font-size: 0.67rem;
+      color: rgba(255,255,255,0.45);
+      margin-top: 4px;
+      line-height: 1.35;
+      /* Desktop: reveal on hover */
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    @media (hover: hover) {
+      .tile:hover .tile-desc { opacity: 1; transform: translateY(0); }
+    }
+    /* Touch devices: always visible */
+    @media (hover: none) {
+      .tile-desc { opacity: 1; transform: none; transition: none; }
+    }
+
+    .tile-primary .tile-name { color: #fff; }
+    .tile-c1     .tile-name  { color: #e8fff8; }
+    .tile-c2     .tile-name  { color: #f0eeff; }
+    .tile-c3     .tile-name  { color: #fff8e8; }
+    .tile-c4     .tile-name  { color: #e8f4ff; }
+    .tile-c5     .tile-name  { color: #ffe8ef; }
+
+    /* ── Lock button: 44×44 touch target (Apple HIG) ── */
+    .lock-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 3;
+      padding: 0;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Visual circle sits inside the touch target */
+    .lock-btn::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.3);
+      border: 0.5px solid rgba(255,255,255,0.12);
+      transition: background 0.15s;
+    }
+    .lock-btn:hover::after,
+    .lock-btn:active::after { background: rgba(0,0,0,0.65); }
+    .lock-btn svg {
+      position: relative;
+      z-index: 1;
+      width: 12px;
+      height: 12px;
+      stroke: rgba(255,255,255,0.6);
+      fill: none;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── Access overlay: fixed modal on all sizes ── */
+    .overlay-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 1000;
+      padding: max(20px, env(safe-area-inset-top))
+               max(20px, env(safe-area-inset-right))
+               max(20px, env(safe-area-inset-bottom))
+               max(20px, env(safe-area-inset-left));
+    }
+    .overlay-bg.open { opacity: 1; pointer-events: all; }
+
+    .overlay-card {
+      background: #1c1c1c;
+      border: 0.5px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 20px;
+      width: min(340px, 100%);
+      transform: translateY(10px) scale(0.97);
+      transition: transform 0.22s ease;
+    }
+    .overlay-bg.open .overlay-card { transform: translateY(0) scale(1); }
+
+    .overlay-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3px;
+      letter-spacing: -0.01em;
+    }
+    .overlay-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+    .overlay-input {
+      width: 100%;
+      background: #0f0f0f;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: #fff;
+      /* 16px prevents iOS auto-zoom on focus */
+      font-size: 16px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 12px 14px;
+      outline: none;
+      letter-spacing: 0.08em;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .overlay-input:focus { border-color: rgba(255,165,89,0.5); }
+    .overlay-input.shake {
+      animation: shake 0.35s ease;
+      border-color: rgba(200,50,50,0.6);
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-6px); }
+      75%      { transform: translateX(6px); }
+    }
+    .err-msg {
+      font-size: 11px;
+      color: #b03030;
+      margin-top: 7px;
+      height: 14px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .err-msg.show { opacity: 1; }
+
+    .overlay-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .overlay-cancel,
+    .overlay-confirm {
+      flex: 1;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 44px;   /* Apple HIG minimum */
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.12s;
+    }
+    .overlay-cancel {
+      background: transparent;
+      border: 0.5px solid rgba(255,255,255,0.12);
+      color: #666;
+    }
+    .overlay-cancel:active { background: rgba(255,255,255,0.05); color: #999; }
+    .overlay-confirm {
+      background: #FFA559;
+      border: none;
+      color: #1a0800;
+      font-weight: 700;
+    }
+    .overlay-confirm:active { opacity: 0.7; }
+
+    /* ── Footnote ── */
+    .footnote {
+      flex-shrink: 0;
+      padding: 0.6rem 0 0.2rem;
+      text-align: center;
+      font-size: 0.63rem;
+      color: #333;
+      letter-spacing: 0.02em;
+    }
+
+    /* ════════════════════════════
+       BREAKPOINTS
+    ════════════════════════════ */
+
+    /* iPad portrait (≥ 744px) — two-column, scrollable */
+    @media (min-width: 744px) {
+      .wrap {
+        padding-left:  max(1.75rem, env(safe-area-inset-left));
+        padding-right: max(1.75rem, env(safe-area-inset-right));
+      }
+      .header h1 { font-size: clamp(2rem, 4vw, 2.8rem); }
+      .layout {
+        flex-direction: row;
+        gap: 2.5rem;
+        align-items: stretch;
+      }
+      .msg-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .grid { flex: 1.5; gap: 10px; }
+      .tile-inner { padding: 16px; }
+      .tile-name  { font-size: clamp(1rem, 2vw, 1.3rem); }
+      .tile-desc  { font-size: 0.72rem; }
+    }
+
+    /* Desktop (≥ 1024px) — locked to one screen, no scroll */
+    @media (min-width: 1024px) {
+      html, body { height: 100dvh; overflow: hidden; }
+      .wrap      { height: 100dvh; min-height: unset; padding: 1.1rem 2rem 0.7rem; }
+      .layout    { flex: 1; min-height: 0; }
+      .grid      { height: 100%; }
+      .tile      { aspect-ratio: unset; height: 100%; }
+      .tile-name { font-size: clamp(0.95rem, 1.4vw, 1.25rem); }
+
+      /* ── Larger message text on desktop ── */
+      .msg-heading { font-size: clamp(1.7rem, 2.4vw, 2.4rem); margin-bottom: 1.25rem; line-height: 1.25; }
+      .msg-body    { font-size: clamp(1.05rem, 1.35vw, 1.35rem); line-height: 1.85; }
+      .msg-body p  { margin-bottom: 1.1rem; }
+      .sig         { margin-top: 2rem; padding-top: 1.1rem; }
+      .sig-name    { font-size: 1.15rem; }
+      .sig-title   { font-size: 0.9rem; margin-top: 5px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <h1>Kneuralabs Intranet</h1>
+    <div class="dateline">
+      <span class="edition">▲ Trust &amp; Security Edition</span>
+      <span id="ts-long"></span>
+      <span id="ts-short"></span>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- Left: message -->
+    <div class="msg-col">
+      <div class="msg-heading">A small note for all of us using the Intranet</div>
+      <div class="msg-body">
+        <p>Every day, our intranet quietly supports how we stay connected — sharing ideas, updates, and information that help us move forward together.</p>
+        <p>Each time we post, upload, or share something, we leave a small imprint on that space. Taking a moment to ensure it's accurate and appropriate makes a bigger difference than it may seem.</p>
+        <p>If we all use the intranet with intention and respect, it remains more than just a tool — something reliable, meaningful, and genuinely helpful for everyone who depends on it.</p>
+      </div>
+      <div class="sig">
+        <div class="sig-name">Kneuralabs Management</div>
+        <div class="sig-title">Trust, Responsibility &amp; Care</div>
+      </div>
+    </div>
+
+    <!-- Right: widget grid -->
+    <div class="grid">
+
+      <!-- 1. Official Website — primary, no lock -->
+      <div class="tile tile-primary">
+        <a href="https://kneuralabs.github.io/site/" target="_blank" rel="noopener noreferrer" class="tile-inner">
+          <div class="tile-name">Official Website</div>
+          <div class="tile-desc">AI governance platform for enterprise compliance</div>
+        </a>
+      </div>
+
+      <!-- 2. Company Handbook — teal, no lock -->
+      <div class="tile tile-c1">
+        <a href="https://kneuralabs.github.io/policy/" target="_blank" rel="noopener noreferrer" class="tile-inner">
+          <div class="tile-name">Company Handbook</div>
+          <div class="tile-desc">Policy, controls, and governance standards</div>
+        </a>
+      </div>
+
+      <!-- 3. Kneuradays — purple, no lock -->
+      <div class="tile tile-c2">
+        <a href="https://kneuralabs.github.io/kneuradays/" target="_blank" rel="noopener noreferrer" class="tile-inner">
+          <div class="tile-name">Kneuradays<sup style="font-size:0.55em;vertical-align:super">™</sup></div>
+          <div class="tile-desc">Time, tasks, and daily work tracking</div>
+        </a>
+      </div>
+
+      <!-- 4. SEA — amber, locked -->
+      <div class="tile tile-c3">
+        <div class="tile-inner" onclick="openOverlay('sea')">
+          <div class="tile-name">SEA<sup style="font-size:0.55em;vertical-align:super">™</sup></div>
+          <div class="tile-desc">Supplier evaluation and performance</div>
+        </div>
+        <button class="lock-btn" onclick="openOverlay('sea')" aria-label="Unlock SEA">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </button>
+        <div class="overlay-bg" id="ov-sea">
+          <div class="overlay-card">
+            <div class="overlay-title">SEA™</div>
+            <div class="overlay-label">Access required</div>
+            <input class="overlay-input" id="in-sea" type="password" placeholder="Enter access word"
+                   autocomplete="off" inputmode="text"
+                   data-url="https://kneuralabs.github.io/sea/">
+            <div class="err-msg" id="er-sea">Incorrect — try again</div>
+            <div class="overlay-row">
+              <button class="overlay-cancel" onclick="closeOverlay('sea')">Cancel</button>
+              <button class="overlay-confirm" onclick="checkWord('sea')">Open</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Kneurascope — blue, locked -->
+      <div class="tile tile-c4">
+        <div class="tile-inner" onclick="openOverlay('scope')">
+          <div class="tile-name">Kneurascope<sup style="font-size:0.55em;vertical-align:super">™</sup></div>
+          <div class="tile-desc">Client AI readiness and governance</div>
+        </div>
+        <button class="lock-btn" onclick="openOverlay('scope')" aria-label="Unlock Kneurascope">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </button>
+        <div class="overlay-bg" id="ov-scope">
+          <div class="overlay-card">
+            <div class="overlay-title">Kneurascope™</div>
+            <div class="overlay-label">Access required</div>
+            <input class="overlay-input" id="in-scope" type="password" placeholder="Enter access word"
+                   autocomplete="off" inputmode="text"
+                   data-url="https://kneuralabs.github.io/scope/">
+            <div class="err-msg" id="er-scope">Incorrect — try again</div>
+            <div class="overlay-row">
+              <button class="overlay-cancel" onclick="closeOverlay('scope')">Cancel</button>
+              <button class="overlay-confirm" onclick="checkWord('scope')">Open</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Kneuralens — pink, locked -->
+      <div class="tile tile-c5">
+        <div class="tile-inner" onclick="openOverlay('lens')">
+          <div class="tile-name">Kneuralens<sup style="font-size:0.55em;vertical-align:super">™</sup></div>
+          <div class="tile-desc">Enterprise AI governance deployment</div>
+        </div>
+        <button class="lock-btn" onclick="openOverlay('lens')" aria-label="Unlock Kneuralens">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </button>
+        <div class="overlay-bg" id="ov-lens">
+          <div class="overlay-card">
+            <div class="overlay-title">Kneuralens™</div>
+            <div class="overlay-label">Access required</div>
+            <input class="overlay-input" id="in-lens" type="password" placeholder="Enter access word"
+                   autocomplete="off" inputmode="text"
+                   data-url="https://kneuralabs.github.io/lens/">
+            <div class="err-msg" id="er-lens">Incorrect — try again</div>
+            <div class="overlay-row">
+              <button class="overlay-cancel" onclick="closeOverlay('lens')">Cancel</button>
+              <button class="overlay-confirm" onclick="checkWord('lens')">Open</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footnote">All links open in a new tab &nbsp;·&nbsp; locked tiles require access word &nbsp;·&nbsp; secure internal access</div>
+
+</div>
+
+<script>
+  /* ── Timestamp ── */
+  function updateTS() {
+    const now  = new Date();
+    const off  = -now.getTimezoneOffset() / 60;
+    const sign = off >= 0 ? '+' : '-';
+    const tz   = ' GMT ' + sign + Math.abs(off);
+
+    const optsLong  = { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false };
+    const optsShort = { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false };
+
+    document.getElementById('ts-long').textContent  = now.toLocaleString('en-US', optsLong)  + tz;
+    document.getElementById('ts-short').textContent = now.toLocaleString('en-US', optsShort) + tz;
+  }
+  updateTS();
+  setInterval(updateTS, 1000);
+
+  /* ── Overlay open / close / check ── */
+  function openOverlay(id) {
+    const inp = document.getElementById('in-' + id);
+    const er  = document.getElementById('er-' + id);
+    const ov  = document.getElementById('ov-' + id);
+
+    ov.classList.add('open');
+    inp.value = '';
+    inp.classList.remove('shake');
+    er.classList.remove('show');
+
+    // Delay focus so iOS transition completes before keyboard rises
+    setTimeout(() => inp.focus(), 280);
+
+    inp.onkeydown = (e) => {
+      if (e.key === 'Enter')  checkWord(id);
+      if (e.key === 'Escape') closeOverlay(id);
+    };
+  }
+
+  function closeOverlay(id) {
+    const inp = document.getElementById('in-' + id);
+    inp.blur();   // dismiss iOS keyboard before hiding overlay
+    document.getElementById('ov-' + id).classList.remove('open');
+  }
+
+  /* Password is never stored in plaintext — only its SHA-256 digest is kept */
+  const _h = 'd841461b2bc0a007f2fc577455684660c864484980ae6f7c147da8ed70f81c68';
+
+  async function checkWord(id) {
+    const inp    = document.getElementById('in-' + id);
+    const er     = document.getElementById('er-'  + id);
+    const url    = inp.dataset.url;
+    const bytes  = new TextEncoder().encode(inp.value.trim());
+    const buf    = await crypto.subtle.digest('SHA-256', bytes);
+    const digest = Array.from(new Uint8Array(buf))
+                        .map(b => b.toString(16).padStart(2, '0')).join('');
+
+    if (digest === _h) {
+      closeOverlay(id);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      inp.classList.remove('shake');
+      void inp.offsetWidth;
+      inp.classList.add('shake');
+      er.classList.add('show');
+      inp.value = '';
+      setTimeout(() => inp.classList.remove('shake'), 400);
+    }
+  }
+
+  /* ── Tap backdrop to dismiss overlay ── */
+  document.querySelectorAll('.overlay-bg').forEach(ov => {
+    ov.addEventListener('click', e => {
+      if (e.target === ov) closeOverlay(ov.id.replace('ov-', ''));
+    });
+  });
+</script>
+</body>
+</html>
