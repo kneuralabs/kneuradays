@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0D1B2A"/>
+  <!-- Accent bar -->
+  <rect x="0" y="0" width="6" height="630" fill="#E8604C"/>
+  <!-- Subtle calendar grid suggestion (bottom area) -->
+  <g opacity="0.06">
+    <line x1="80" y1="420" x2="1140" y2="420" stroke="#fff" stroke-width="1"/>
+    <line x1="80" y1="470" x2="1140" y2="470" stroke="#fff" stroke-width="1"/>
+    <line x1="80" y1="520" x2="1140" y2="520" stroke="#fff" stroke-width="1"/>
+    <line x1="80" y1="570" x2="1140" y2="570" stroke="#fff" stroke-width="1"/>
+    <line x1="228" y1="400" x2="228" y2="590" stroke="#fff" stroke-width="1"/>
+    <line x1="376" y1="400" x2="376" y2="590" stroke="#fff" stroke-width="1"/>
+    <line x1="524" y1="400" x2="524" y2="590" stroke="#fff" stroke-width="1"/>
+    <line x1="672" y1="400" x2="672" y2="590" stroke="#fff" stroke-width="1"/>
+    <line x1="820" y1="400" x2="820" y2="590" stroke="#fff" stroke-width="1"/>
+    <line x1="968" y1="400" x2="968" y2="590" stroke="#fff" stroke-width="1"/>
+  </g>
+  <!-- K lettermark -->
+  <rect x="80" y="150" width="76" height="76" rx="16" fill="#E8604C"/>
+  <text x="118" y="207" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="50" text-anchor="middle" fill="#fff">K</text>
+  <!-- Wordmark -->
+  <text x="174" y="208" font-family="Arial,sans-serif" font-weight="700" font-size="56" fill="#FFFFFF">neuradays</text>
+  <!-- Tagline -->
+  <text x="80" y="275" font-family="Arial,sans-serif" font-weight="300" font-size="24" fill="#8E9AAB" letter-spacing="0.3">log your days. know your hours.</text>
+  <!-- Divider -->
+  <rect x="80" y="315" width="60" height="2" fill="#E8604C" opacity="0.6"/>
+  <!-- Feature pills -->
+  <rect x="80" y="340" width="120" height="32" rx="16" fill="#ffffff" opacity="0.07"/>
+  <text x="140" y="361" font-family="Arial,sans-serif" font-size="14" fill="#fff" text-anchor="middle" opacity="0.8">Full Work</text>
+  <rect x="212" y="340" width="120" height="32" rx="16" fill="#ffffff" opacity="0.07"/>
+  <text x="272" y="361" font-family="Arial,sans-serif" font-size="14" fill="#fff" text-anchor="middle" opacity="0.8">Leave Tracking</text>
+  <rect x="344" y="340" width="120" height="32" rx="16" fill="#ffffff" opacity="0.07"/>
+  <text x="404" y="361" font-family="Arial,sans-serif" font-size="14" fill="#fff" text-anchor="middle" opacity="0.8">40h Week</text>
+  <rect x="476" y="340" width="120" height="32" rx="16" fill="#ffffff" opacity="0.07"/>
+  <text x="536" y="361" font-family="Arial,sans-serif" font-size="14" fill="#fff" text-anchor="middle" opacity="0.8">PDF Export</text>
+  <!-- Attribution -->
+  <text x="1140" y="605" font-family="Arial,sans-serif" font-size="16" fill="#3D5166" text-anchor="end">by Kneuralabs</text>
+</svg>

@@ -3,24 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Kneuradays · work calendar</title>
+  <title>Kneuradays · Work Calendar</title>
+  <meta name="description" content="Track work, leave and sick days across your 40h week. Simple, private, local.">
+  <meta property="og:title" content="Kneuradays by Kneuralabs">
+  <meta property="og:description" content="Log your days. Know your hours.">
+  <meta property="og:image" content="og.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Kneuradays">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kneuradays by Kneuralabs">
+  <meta name="twitter:description" content="Log your days. Know your hours.">
+  <meta name="twitter:image" content="og.svg">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
-    /* ============================================================
-       DESIGN TOKENS — single source of truth
-    ============================================================ */
+    /* Design tokens */
     :root {
-      /* Typography scale */
-      --text-xs:   0.7rem;    /* 11.2px — minimum, captions */
-      --text-sm:   0.75rem;   /* 12px   — secondary labels  */
-      --text-base: 0.875rem;  /* 14px   — body              */
-      --text-md:   1rem;      /* 16px   — default           */
-      --text-lg:   1.25rem;   /* 20px   — title             */
-      --text-xl:   1.6rem;    /* 25.6px — headline          */
+      --text-xs:   0.7rem;
+      --text-sm:   0.75rem;
+      --text-base: 0.875rem;
+      --text-md:   1rem;
+      --text-lg:   1.25rem;
+      --text-xl:   1.6rem;
       --text-hero: clamp(3.5rem, 12vw, 7rem);
 
-      /* Spacing — 4px base grid */
       --sp-1: 4px;
       --sp-2: 8px;
       --sp-3: 12px;
@@ -29,23 +36,20 @@
       --sp-8: 32px;
       --sp-12: 48px;
 
-      /* Radius */
       --r-sm: 5px;
       --r-md: 8px;
       --r-lg: 12px;
       --r-xl: 16px;
 
-      /* Brand palette */
       --ink:        #0D1B2A;
       --ink-muted:  #3D5166;
       --ink-faint:  #8E9AAB;
       --surface:    #F7F5F0;
       --surface-warm: #FEFCF8;
       --white:      #FFFFFF;
-      --accent:     #E8604C;   /* primary CTA only */
+      --accent:     #E8604C;
       --accent-hover: #D04535;
 
-      /* Semantic status — one red, used for ONE purpose each */
       --status-fw-bg:     #EAF5F0;
       --status-fw-border: #0A7A50;
       --status-fw-text:   #0A5A3C;
@@ -71,14 +75,12 @@
       --status-ph-text:   #7A4A0A;
       --status-ph-swatch: #E8A020;
 
-      --danger:     #C5062A;   /* errors only */
+      --danger:     #C5062A;
       --border:     #D0D5DD;
       --border-dark: #3D5166;
     }
 
-    /* ============================================================
-       RESET — no global border-radius kill
-    ============================================================ */
+    /* Reset */
     *, *::before, *::after {
       margin: 0;
       padding: 0;
@@ -94,9 +96,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ============================================================
-       ANIMATIONS — preserved, they're good
-    ============================================================ */
+    /* Animations */
     @keyframes fadeInScale {
       0%   { opacity: 0; transform: scale(0.96) translateY(8px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
@@ -122,9 +122,7 @@
     .login-card { animation: fadeInScale 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
     .app        { animation: fadeSlideUp 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; }
 
-    /* ============================================================
-       LOGIN SCREEN
-    ============================================================ */
+    /* Login screen */
     .login-overlay {
       position: fixed;
       inset: 0;
@@ -138,11 +136,14 @@
     .login-card {
       background: transparent;
       text-align: left;
-      padding: 0;
       width: 100%;
       max-width: 720px;
       margin: 0 auto;
       padding: 0 var(--sp-6);
+    }
+
+    .login-mark {
+      margin-bottom: var(--sp-4);
     }
 
     .title-row {
@@ -154,7 +155,6 @@
       margin-bottom: var(--sp-3);
     }
 
-    /* FIX: Distinctive display font for the wordmark */
     .login-card h1 {
       font-size: var(--text-hero);
       font-weight: 800;
@@ -165,7 +165,6 @@
       margin: 0;
     }
 
-    /* FIX: font-weight 350 → 300 (explicit standard value) */
     .byline {
       font-size: clamp(0.85rem, 4vw, 1.1rem);
       font-weight: 300;
@@ -174,7 +173,6 @@
       white-space: nowrap;
     }
 
-    /* FIX: benefit-led copy + standard weight */
     .login-sub {
       font-size: clamp(0.8rem, 3.5vw, 1rem);
       font-weight: 300;
@@ -190,7 +188,6 @@
       gap: var(--sp-4);
     }
 
-    /* FIX: monospace font is actually monospace */
     .login-card input {
       width: 280px;
       max-width: 85%;
@@ -198,17 +195,17 @@
       border: none;
       border-bottom: 1px solid var(--border);
       padding: 0.6rem 0 0.4rem;
-      font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+      font-family: 'Inter', sans-serif;
+      font-variant-numeric: tabular-nums;
       font-size: var(--text-md);
       font-weight: 400;
       color: var(--ink);
       outline: none;
       transition: border-color 0.2s ease;
       border-radius: 0;
+      touch-action: manipulation;
     }
-    .login-card input:focus {
-      border-bottom-color: var(--ink);
-    }
+    .login-card input:focus { border-bottom-color: var(--ink); }
 
     .login-card button {
       background: var(--ink);
@@ -222,6 +219,7 @@
       letter-spacing: 0.2px;
       border-radius: var(--r-md);
       transition: background 0.2s ease, transform 0.1s ease;
+      touch-action: manipulation;
     }
     .login-card button:hover  { background: var(--accent); transform: translateY(-1px); }
     .login-card button:active { transform: scale(0.96); }
@@ -230,19 +228,16 @@
       color: var(--danger);
       font-size: var(--text-xs);
       font-weight: 400;
-      min-height: 1.2rem; /* reserve space — no layout shift */
+      min-height: 1.2rem;
     }
 
-    /* FIX: Removed "✧ magic word required ✧" — replaced with neutral hint */
     .login-hint {
       font-size: var(--text-xs);
       color: #B0BAC5;
       font-weight: 300;
     }
 
-    /* ============================================================
-       MAIN APP SHELL
-    ============================================================ */
+    /* App shell */
     .app-container { display: none; }
 
     .app {
@@ -254,13 +249,11 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
 
-    /* ============================================================
-       APP HEADER
-    ============================================================ */
+    /* App header */
     .kneura-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
       flex-wrap: wrap;
       gap: var(--sp-4);
       margin-bottom: var(--sp-6);
@@ -270,13 +263,15 @@
 
     .header-title { flex: 1; }
 
-    /* FIX: title case, not all-caps */
     .header-title h1 {
       font-size: var(--text-xl);
       font-weight: 700;
       font-family: 'Inter', sans-serif;
       letter-spacing: -0.5px;
       color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
     }
     .header-title h1 span {
       font-family: 'Inter', sans-serif;
@@ -301,12 +296,11 @@
       font-weight: 400;
       border-radius: var(--r-sm);
       transition: color 0.2s, transform 0.2s;
+      touch-action: manipulation;
     }
-    .logout-link:hover  { color: var(--accent); transform: translateX(2px); }
+    .logout-link:hover { color: var(--accent); transform: translateX(2px); }
 
-    /* ============================================================
-       EMPLOYEE + SUMMARY PANEL ROW
-    ============================================================ */
+    /* Employee + summary panel */
     .top-dual-panel {
       display: flex;
       flex-wrap: wrap;
@@ -340,13 +334,13 @@
       letter-spacing: 0.06em;
     }
 
-    /* FIX: proper monospace font; cleaner border style */
     .emp-field input {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--r-sm);
       padding: var(--sp-2) var(--sp-3);
-      font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+      font-family: 'Inter', sans-serif;
+      font-variant-numeric: tabular-nums;
       font-size: var(--text-sm);
       width: 160px;
       color: var(--ink);
@@ -358,9 +352,7 @@
       box-shadow: 0 0 0 3px rgba(232,96,76,0.12);
     }
 
-    /* ============================================================
-       WEEKLY SUMMARY PANEL
-    ============================================================ */
+    /* Weekly summary panel */
     .right-summary-panel {
       flex: 1;
       min-width: 260px;
@@ -391,7 +383,8 @@
     .week-row-compact:last-of-type { border-bottom: none; }
 
     .week-row-compact .week-hours {
-      font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+      font-family: 'Inter', sans-serif;
+      font-variant-numeric: tabular-nums;
       font-size: var(--text-xs);
       font-weight: 500;
     }
@@ -403,7 +396,6 @@
       color: var(--status-fl-text);
     }
 
-    /* Legend inside summary panel */
     .legend-compact {
       display: flex;
       flex-wrap: wrap;
@@ -427,16 +419,14 @@
       border-radius: 3px;
       flex-shrink: 0;
     }
-    .legend-swatch-compact.fw-bg { background: var(--status-fw-swatch); }
-    .legend-swatch-compact.fl-bg { background: var(--status-fl-swatch); }
-    .legend-swatch-compact.hl-bg { background: var(--status-hl-swatch); }
-    .legend-swatch-compact.sl-bg { background: var(--status-sl-swatch); }
-    .legend-swatch-compact.ph-bg { background: var(--status-ph-swatch); }
+    .legend-swatch-compact.fw-bg     { background: var(--status-fw-swatch); }
+    .legend-swatch-compact.fl-bg     { background: var(--status-fl-swatch); }
+    .legend-swatch-compact.hl-bg     { background: var(--status-hl-swatch); }
+    .legend-swatch-compact.sl-bg     { background: var(--status-sl-swatch); }
+    .legend-swatch-compact.ph-bg     { background: var(--status-ph-swatch); }
     .legend-swatch-compact.weekend-swatch { background: var(--border); }
 
-    /* ============================================================
-       NAV + TOOLBAR ROW
-    ============================================================ */
+    /* Nav + toolbar */
     .nav-toolbar {
       display: flex;
       justify-content: space-between;
@@ -463,6 +453,7 @@
       font-size: var(--text-sm);
       color: var(--ink);
       transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      touch-action: manipulation;
     }
     .nav-btn:hover  { background: var(--ink); color: var(--white); transform: translateY(-1px); }
     .nav-btn:active { transform: scale(0.96); }
@@ -480,7 +471,6 @@
     }
     select:focus { outline: none; border-color: var(--accent); }
 
-    /* FIX: PDF button — no emoji, proper icon */
     .submit-btn {
       background: var(--ink);
       color: var(--white);
@@ -494,14 +484,13 @@
       align-items: center;
       gap: var(--sp-2);
       transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      touch-action: manipulation;
     }
     .submit-btn:hover  { background: var(--accent); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(232,96,76,0.25); }
     .submit-btn:active { transform: scale(0.96); }
-    .submit-btn svg   { flex-shrink: 0; }
+    .submit-btn svg    { flex-shrink: 0; }
 
-    /* ============================================================
-       INFO BAR — separated concerns
-    ============================================================ */
+    /* Info bar */
     .info-bar {
       display: flex;
       flex-wrap: wrap;
@@ -511,7 +500,6 @@
       margin-bottom: var(--sp-4);
     }
 
-    /* Leave counter */
     .leave-counter {
       font-size: var(--text-sm);
       font-weight: 500;
@@ -521,10 +509,10 @@
       border-radius: var(--r-lg);
       transition: all 0.2s;
       color: var(--ink);
+      white-space: nowrap;
     }
     .leave-counter span { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-weight: 600; }
 
-    /* FIX: warning takes reserved space, clear on next-action */
     .warning-slot {
       flex: 1;
       min-height: 2rem;
@@ -543,15 +531,16 @@
     }
     .warning.visible { display: block; }
 
-    /* FIX: <button> elements, not <a> tags; proper labels */
     .status-buttons-group {
       display: flex;
       gap: var(--sp-2);
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .status-btn {
-      font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+      font-family: 'Inter', sans-serif;
+      font-variant-numeric: tabular-nums;
       font-weight: 500;
       font-size: var(--text-xs);
       padding: 5px 10px;
@@ -567,11 +556,11 @@
       border-color: var(--border-dark);
       transition: all 0.18s cubic-bezier(0.23, 1, 0.32, 1);
       will-change: transform;
+      touch-action: manipulation;
     }
-    .status-btn .btn-code { font-weight: 700; font-size: 0.7rem; }
+    .status-btn .btn-code  { font-weight: 700; font-size: 0.7rem; }
     .status-btn .btn-label { font-size: 0.65rem; font-family: 'Inter', sans-serif; font-weight: 400; opacity: 0.75; letter-spacing: 0.02em; }
 
-    /* FIX: Colored borders/text, not saturated fills */
     .status-btn.FW { background: var(--status-fw-bg); border-color: var(--status-fw-border); color: var(--status-fw-text); }
     .status-btn.FL { background: var(--status-fl-bg); border-color: var(--status-fl-border); color: var(--status-fl-text); }
     .status-btn.HL { background: var(--status-hl-bg); border-color: var(--status-hl-border); color: var(--status-hl-text); }
@@ -580,9 +569,7 @@
     .status-btn:hover  { filter: brightness(0.92); transform: translateY(-1px); }
     .status-btn:active { transform: scale(0.94); filter: brightness(0.88); }
 
-    /* ============================================================
-       HOW TO USE — collapsed by default
-    ============================================================ */
+    /* How to use */
     .how-to-use {
       margin-bottom: var(--sp-3);
       font-size: var(--text-xs);
@@ -604,9 +591,7 @@
     .how-to-use p { margin-top: var(--sp-2); line-height: 1.6; }
     .how-to-use strong { font-weight: 600; }
 
-    /* ============================================================
-       CALENDAR
-    ============================================================ */
+    /* Calendar */
     .calendar-main { width: 100%; }
 
     .weekdays {
@@ -636,12 +621,11 @@
       overflow: hidden;
     }
 
-    /* FIX: soft fills, colored left-border indicator; proper radius */
     .day-cell {
       border-right: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
       min-height: 88px;
-      padding: var(--sp-2) var(--sp-2);
+      padding: var(--sp-2);
       cursor: pointer;
       position: relative;
       transition: background-color 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1),
@@ -649,65 +633,37 @@
                   box-shadow 0.18s ease;
       will-change: background-color, transform;
       background: var(--white);
+      touch-action: manipulation;
     }
 
-    /* FIX: pastel status fills — not saturated solid blocks */
-    .day-cell.fw-bg {
-      background: var(--status-fw-bg);
-      border-left: 3px solid var(--status-fw-border);
-      color: var(--status-fw-text);
-    }
-    .day-cell.fl-bg {
-      background: var(--status-fl-bg);
-      border-left: 3px solid var(--status-fl-border);
-      color: var(--status-fl-text);
-    }
-    .day-cell.hl-bg {
-      background: var(--status-hl-bg);
-      border-left: 3px solid var(--status-hl-border);
-      color: var(--status-hl-text);
-    }
-    .day-cell.sl-bg {
-      background: var(--status-sl-bg);
-      border-left: 3px solid var(--status-sl-border);
-      color: var(--status-sl-text);
-    }
-    .day-cell.ph-bg {
-      background: var(--status-ph-bg);
-      border-left: 3px solid var(--status-ph-border);
-      color: var(--status-ph-text);
-    }
+    .day-cell.fw-bg { background: var(--status-fw-bg); border-left: 3px solid var(--status-fw-border); color: var(--status-fw-text); }
+    .day-cell.fl-bg { background: var(--status-fl-bg); border-left: 3px solid var(--status-fl-border); color: var(--status-fl-text); }
+    .day-cell.hl-bg { background: var(--status-hl-bg); border-left: 3px solid var(--status-hl-border); color: var(--status-hl-text); }
+    .day-cell.sl-bg { background: var(--status-sl-bg); border-left: 3px solid var(--status-sl-border); color: var(--status-sl-text); }
+    .day-cell.ph-bg { background: var(--status-ph-bg); border-left: 3px solid var(--status-ph-border); color: var(--status-ph-text); }
 
-    .day-cell.weekend {
-      background: var(--surface);
-      opacity: 0.65;
-      cursor: default;
-    }
-    .day-cell.other-month  { background: var(--surface); opacity: 0.4; cursor: default; }
+    .day-cell.weekend     { background: var(--surface); opacity: 0.65; cursor: default; }
+    .day-cell.other-month { background: var(--surface); opacity: 0.4; cursor: default; }
     .day-cell.future-locked { background: #F4F3EF; opacity: 0.55; cursor: not-allowed; color: var(--ink-faint); }
 
-    /* Selected: accent outline */
     .day-cell.selected {
       outline: 2.5px solid var(--accent);
       outline-offset: -2px;
       transition: outline 0.12s ease;
     }
 
-    /* Hover lift — editable cells only */
     .day-cell:not(.weekend):not(.future-locked):not(.other-month):hover {
       transform: translateY(-1.5px);
       box-shadow: 0 6px 14px -8px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.02);
       background-color: var(--surface-warm);
       cursor: pointer;
     }
-    /* Keep status bg on hover for colored cells */
     .day-cell.fw-bg:not(.weekend):not(.future-locked):hover { background-color: var(--status-fw-bg); }
     .day-cell.fl-bg:not(.weekend):not(.future-locked):hover { background-color: var(--status-fl-bg); }
     .day-cell.hl-bg:not(.weekend):not(.future-locked):hover { background-color: var(--status-hl-bg); }
     .day-cell.sl-bg:not(.weekend):not(.future-locked):hover { background-color: var(--status-sl-bg); }
     .day-cell.ph-bg:not(.weekend):not(.future-locked):hover { background-color: var(--status-ph-bg); }
 
-    /* FIX: day number — consistent across all cells, no neon mint */
     .day-number {
       font-size: var(--text-sm);
       font-weight: 700;
@@ -715,10 +671,10 @@
       line-height: 1;
     }
 
-    /* Status label chip inside cell */
     .cell-status-label {
       display: inline-block;
-      font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+      font-family: 'Inter', sans-serif;
+      font-variant-numeric: tabular-nums;
       font-size: 0.65rem;
       font-weight: 600;
       padding: 1px 5px;
@@ -731,7 +687,6 @@
     .hl-bg .cell-status-label { background: var(--status-hl-border); color: #fff; }
     .sl-bg .cell-status-label { background: var(--status-sl-border); color: #fff; }
 
-    /* FIX: holiday name — readable size */
     .holiday-name {
       font-size: var(--text-xs);
       margin-top: var(--sp-1);
@@ -742,16 +697,10 @@
       animation: fadeSlideUp 0.2s ease-out;
     }
 
-    /* Flash feedback on mark */
-    .day-cell-flash { animation: flashHighlight 0.35s ease-out; }
+    .day-cell-flash       { animation: flashHighlight 0.35s ease-out; }
+    .leave-counter-flash  { animation: gentlePulse 0.35s ease-out forwards; }
 
-    /* Leave counter flash */
-    .leave-counter-flash { animation: gentlePulse 0.35s ease-out forwards; }
-
-    /* ============================================================
-       FOOTER — moved instruction above calendar (in HTML),
-       footer is now attribution only
-    ============================================================ */
+    /* Footer */
     .footer {
       margin-top: var(--sp-4);
       font-size: var(--text-xs);
@@ -761,25 +710,71 @@
       padding-top: var(--sp-4);
     }
 
-    /* ============================================================
-       INPUT FOCUS SHARED
-    ============================================================ */
+    /* Shared focus */
     input:focus, select:focus {
       border-color: var(--accent);
       box-shadow: 0 1px 0 0 var(--accent);
     }
 
-    /* ============================================================
-       KEYBOARD FOCUS VISIBLE
-    ============================================================ */
     .day-cell:focus-visible {
       outline: 2.5px solid var(--accent);
       outline-offset: -2px;
     }
 
-    /* ============================================================
-       PRINT
-    ============================================================ */
+    /* ── Mobile portrait ──────── max 479px */
+    @media (max-width: 479px) {
+      body { padding: 6px; }
+      .app { padding: 10px 10px 16px; border-radius: var(--r-lg); }
+      .kneura-header { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: var(--sp-4); }
+      .top-dual-panel { flex-direction: column; }
+      .emp-group { gap: 10px; }
+      .emp-field input { width: 100%; max-width: 220px; }
+      .right-summary-panel { min-width: unset; width: 100%; }
+      .nav-toolbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .nav-group { flex-wrap: wrap; }
+      .submit-btn { width: 100%; justify-content: center; }
+      .info-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .status-buttons-group { flex-wrap: wrap; gap: 5px; }
+      .status-btn .btn-label { display: none; }
+      .day-cell { min-height: 50px; padding: 3px 2px; }
+      .day-number { font-size: 0.62rem; }
+      .cell-status-label { font-size: 0.5rem; padding: 1px 2px; }
+      .holiday-name { display: none; }
+      .weekday { font-size: 0.58rem; padding: 3px 1px; }
+    }
+
+    /* ── Mobile landscape ─────── 480–767px */
+    @media (min-width: 480px) and (max-width: 767px) {
+      body { padding: 8px; }
+      .app { padding: 14px 14px 20px; border-radius: var(--r-lg); }
+      .top-dual-panel { flex-direction: column; }
+      .right-summary-panel { min-width: unset; width: 100%; }
+      .day-cell { min-height: 62px; }
+      .status-btn .btn-label { display: none; }
+      .holiday-name { font-size: 0.6rem; }
+    }
+
+    /* ── Tablet portrait ──────── 768–1023px */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .app { padding: 20px; }
+      .day-cell { min-height: 76px; }
+      .emp-field input { width: 140px; }
+      .right-summary-panel { min-width: 220px; }
+    }
+
+    /* ── Tablet landscape / laptop ── 1024–1279px */
+    @media (min-width: 1024px) and (max-width: 1279px) {
+      .app { padding: 24px; }
+      .day-cell { min-height: 84px; }
+    }
+
+    /* ── Desktop ──────────────── 1280px+ */
+    @media (min-width: 1280px) {
+      .app { padding: 32px 32px 40px; }
+      .day-cell { min-height: 96px; }
+    }
+
+    /* ── Print */
     @media print {
       .nav-group, .warning-slot, .submit-btn, .nav-btn,
       select, .status-buttons-group, .logout-link, .how-to-use {
@@ -788,62 +783,56 @@
       .day-cell.selected { outline: none; }
       .app { box-shadow: none; border-radius: 0; }
     }
-
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
-    @media (max-width: 800px) {
-      .day-cell { min-height: 72px; }
-      .emp-field input { width: 130px; }
-      .app { padding: var(--sp-4); border-radius: var(--r-lg); }
-    }
-
-    @media (max-width: 600px) {
-      .status-btn .btn-label { display: none; }
-      .info-bar { flex-direction: column; align-items: flex-start; }
-    }
   </style>
 </head>
 <body>
 
-<!-- ============================================================
-     LOGIN SCREEN
-============================================================ -->
+<!-- Login screen -->
 <div id="loginOverlay" class="login-overlay">
   <div class="login-card">
+    <!-- K brand mark -->
+    <div class="login-mark">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="44" height="44" rx="10" fill="#0D1B2A"/>
+        <rect x="6" y="0" width="4" height="44" rx="2" fill="#E8604C"/>
+        <text x="27" y="31" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="26" text-anchor="middle" fill="#FFFFFF">K</text>
+      </svg>
+    </div>
     <div class="title-row">
       <h1>Kneuradays</h1>
       <span class="byline">by Kneuralabs</span>
     </div>
-    <!-- FIX: benefit-led copy -->
-    <div class="login-sub">log your days. know your hours.</div>
+    <div class="login-sub">Track work, leave &amp; sick days across your 40h week.</div>
     <div class="login-form">
       <input type="text" id="magicInput" placeholder="access code" autocomplete="off" aria-label="Access code">
       <button id="loginBtn" type="button">enter &rarr;</button>
-      <!-- FIX: persistent error with reserved space; doesn't reveal password -->
       <div id="loginError" class="login-error" role="alert" aria-live="polite"></div>
       <div class="login-hint">Enter your access code to continue.</div>
     </div>
   </div>
 </div>
 
-<!-- ============================================================
-     MAIN APP
-============================================================ -->
+<!-- Main app -->
 <div id="appContainer" class="app-container">
 <div class="app" id="appRoot">
 
-  <!-- HEADER -->
+  <!-- Header -->
   <div class="kneura-header">
     <div class="header-title">
-      <!-- FIX: title case, not all-caps -->
-      <h1>Kneuradays <span>by Kneuralabs</span></h1>
+      <h1>
+        <svg width="22" height="22" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0">
+          <rect width="44" height="44" rx="10" fill="#0D1B2A"/>
+          <rect x="6" y="0" width="4" height="44" rx="2" fill="#E8604C"/>
+          <text x="27" y="31" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="26" text-anchor="middle" fill="#FFFFFF">K</text>
+        </svg>
+        Kneuradays <span>by Kneuralabs</span>
+      </h1>
       <p>work &middot; leave &middot; sick leave &middot; public holidays &middot; 40h week</p>
     </div>
     <button id="logoutBtn" class="logout-link" type="button">Sign out</button>
   </div>
 
-  <!-- EMPLOYEE FIELDS + WEEKLY SUMMARY -->
+  <!-- Employee fields + weekly summary -->
   <div class="top-dual-panel">
     <div class="emp-group">
       <div class="emp-field">
@@ -858,7 +847,7 @@
     <div class="right-summary-panel" id="compactSummaryPanel"></div>
   </div>
 
-  <!-- NAV + PDF BUTTON -->
+  <!-- Nav + PDF -->
   <div class="nav-toolbar">
     <div class="nav-group">
       <button class="nav-btn" id="prevMonth" type="button" aria-label="Previous month">&larr;</button>
@@ -866,7 +855,6 @@
       <select id="yearSelect" aria-label="Year"></select>
       <button class="nav-btn" id="nextMonth" type="button" aria-label="Next month">&rarr;</button>
     </div>
-    <!-- FIX: SVG icon instead of emoji -->
     <button class="submit-btn" id="submitPdfBtn" type="button">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M8 11L4 7h2.5V2h3v5H12L8 11z" fill="currentColor"/>
@@ -876,16 +864,14 @@
     </button>
   </div>
 
-  <!-- INFO BAR — separated: leave counter | warning | action buttons -->
+  <!-- Info bar -->
   <div class="info-bar">
     <div class="leave-counter" aria-live="polite">
       Leave used: <span id="totalLeaveUsed">0</span> / 30 days
     </div>
     <div class="warning-slot">
-      <!-- FIX: persistent until cleared; reserved space prevents layout shift -->
       <div id="globalWarning" class="warning" role="alert"></div>
     </div>
-    <!-- FIX: <button> elements, not <a> links; two-line label for self-evidence -->
     <div class="status-buttons-group" role="group" aria-label="Mark selected day">
       <button id="setFW" class="status-btn FW" type="button" title="Full Work Day (8h)">
         <span class="btn-code">FW</span>
@@ -906,36 +892,33 @@
     </div>
   </div>
 
-  <!-- FIX: HOW TO USE — moved above calendar, collapsed by default -->
+  <!-- How to use -->
   <details class="how-to-use">
     <summary>How to log time</summary>
     <p>
-      Click any <strong>weekday</strong> to select it (highlighted in orange), then press a status button above:
+      Click any <strong>weekday</strong> to select it, then press a status button above:
       <strong>FW</strong> (full work, 8h) &middot;
-      <strong>FL</strong> (full leave, 0h) &middot;
+      <strong>FL</strong> (full leave, 0h, counts against quota) &middot;
       <strong>HL</strong> (half leave, 4h) &middot;
-      <strong>SL</strong> (sick leave, 0h).
-      <strong style="color:var(--status-ph-text);">Gold-tinted cells</strong> are public holidays.
-      Future months are locked. Max 30 leave days (FL = 1, HL = 0.5) per year.
+      <strong>SL</strong> (sick leave, 0h, does not count against quota).
+      <strong style="color:var(--status-ph-text);">Gold-tinted cells</strong> are public holidays. Future dates are locked. Max 30 leave days per year.
     </p>
   </details>
 
-  <!-- CALENDAR -->
+  <!-- Calendar -->
   <div class="calendar-main">
     <div class="weekdays" id="weekdayHeader"></div>
     <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="Work calendar"></div>
   </div>
 
-  <!-- FOOTER — attribution only, no instructions here -->
-  <div class="footer">Kneuradays &middot; Kneuralabs &middot; Data stored locally in your browser</div>
+  <!-- Footer -->
+  <div class="footer">Kneuradays by Kneuralabs &middot; Data stored locally in your browser &middot; &copy; 2026</div>
 
 </div>
 </div>
 
 <script>
-  /* ============================================================
-     STATUS DEFINITIONS
-  ============================================================ */
+  /* Status definitions */
   const STATUS = {
     FW: { label: 'FW', hours: 8,  bgClass: 'fw-bg', fullName: 'Full Work' },
     FL: { label: 'FL', hours: 0,  bgClass: 'fl-bg', fullName: 'Full Leave' },
@@ -943,9 +926,7 @@
     SL: { label: 'SL', hours: 0,  bgClass: 'sl-bg', fullName: 'Sick Leave' }
   };
 
-  /* ============================================================
-     PUBLIC HOLIDAYS (US — 13 per year)
-  ============================================================ */
+  /* Public holidays (US — 13 per year) */
   function get13StateHolidays(year) {
     const holidays = [];
     holidays.push({ dateStr: `${year}-01-01`, name: "New Year's Day" });
@@ -997,15 +978,12 @@
     return map[year] || `${year}-11-01`;
   }
 
-  /* ============================================================
-     GLOBAL STATE
-  ============================================================ */
+  /* Global state */
   let currentYear = new Date().getFullYear(), currentMonth = new Date().getMonth();
   let marksStore = new Map();
   let holidayMap = new Map();
   let selectedDateKey = null;
-  let warningTimer = null;
-  const MARKS_STORAGE = 'workcal_marks_v6_blank_default'; // same key — preserves existing data
+  const MARKS_STORAGE = 'workcal_marks_v6_blank_default';
 
   function saveAllMarks() { localStorage.setItem(MARKS_STORAGE, JSON.stringify([...marksStore.entries()])); }
 
@@ -1052,12 +1030,9 @@
     return new Date(year, month-1, day) > today;
   }
 
-  /* ============================================================
-     WARNING SYSTEM — FIX: persistent until next valid action
-  ============================================================ */
+  /* Warning system */
   function showWarning(msg) {
     const warnDiv = document.getElementById('globalWarning');
-    if (warningTimer) clearTimeout(warningTimer);
     warnDiv.textContent = msg;
     warnDiv.classList.add('visible');
   }
@@ -1068,15 +1043,10 @@
     warnDiv.textContent = '';
   }
 
-  /* ============================================================
-     DATE STATUS LOGIC
-  ============================================================ */
+  /* Date status logic */
   function setDateStatus(dateKey, newStatus) {
     if (!dateKey || holidayMap.has(dateKey)) return false;
-    if (isFutureDate(dateKey)) {
-      showWarning('Cannot modify future dates.');
-      return false;
-    }
+    if (isFutureDate(dateKey)) { showWarning('Cannot modify future dates.'); return false; }
     const year = parseInt(dateKey.slice(0,4), 10);
     const oldStatus = marksStore.get(dateKey);
     if (oldStatus === newStatus) return false;
@@ -1086,9 +1056,7 @@
     return true;
   }
 
-  /* ============================================================
-     WEEKLY HOURS COMPUTATION
-  ============================================================ */
+  /* Weekly hours computation */
   function getMonday(d) {
     const date = new Date(d);
     const day = date.getDay();
@@ -1137,9 +1105,7 @@
     return result.sort((a,b) => a.monday - b.monday);
   }
 
-  /* ============================================================
-     RENDER CALENDAR
-  ============================================================ */
+  /* Render calendar */
   function renderCalendar() {
     const year = currentYear, month = currentMonth;
     const firstDay = new Date(year, month, 1);
@@ -1187,7 +1153,6 @@
 
       const isEditable = isCurrent && !isWeekend && !isHoliday && !futureLock;
 
-      /* FIX: keyboard accessible cells */
       if (isEditable) {
         dayDiv.setAttribute('tabindex', '0');
         dayDiv.setAttribute('role', 'button');
@@ -1205,7 +1170,6 @@
       numSpan.textContent = cellDay;
       dayDiv.appendChild(numSpan);
 
-      /* FIX: status label chip inside cell (replaces neon-colored huge number) */
       if (userStatus && isCurrent && !futureLock && !isWeekend && !isHoliday) {
         const chipSpan = document.createElement('div');
         chipSpan.className = 'cell-status-label';
@@ -1224,7 +1188,7 @@
         return function() {
           if (editable) {
             selectedDateKey = dKey;
-            clearWarning(); /* FIX: clear warning on valid interaction */
+            clearWarning();
             renderCalendar();
             renderCompactSummaryAndLegend();
           }
@@ -1236,9 +1200,7 @@
     updateLeaveUI();
   }
 
-  /* ============================================================
-     RENDER SUMMARY PANEL
-  ============================================================ */
+  /* Render summary panel */
   function renderCompactSummaryAndLegend() {
     const container = document.getElementById('compactSummaryPanel');
     if (!container) return;
@@ -1269,9 +1231,7 @@
     container.innerHTML = summaryHtml;
   }
 
-  /* ============================================================
-     LEAVE UI
-  ============================================================ */
+  /* Leave UI */
   function updateLeaveUI() {
     const totalUsed = getTotalLeaveDaysUsed(currentYear);
     document.getElementById('totalLeaveUsed').textContent = totalUsed.toFixed(1);
@@ -1287,9 +1247,7 @@
     }
   }
 
-  /* ============================================================
-     PDF EXPORT
-  ============================================================ */
+  /* PDF export */
   function downloadPDF() {
     const element = document.getElementById('appRoot').cloneNode(true);
     ['.status-buttons-group', '.nav-group', '.submit-btn', '.logout-link', '.warning-slot', '.how-to-use'].forEach(sel => {
@@ -1305,18 +1263,10 @@
     html2pdf().set(opt).from(element).save();
   }
 
-  /* ============================================================
-     APPLY STATUS TO SELECTED DAY
-  ============================================================ */
+  /* Apply status to selected day */
   function applyStatusToSelected(newStatus) {
-    if (!selectedDateKey) {
-      showWarning('Select a weekday first, then choose a status.');
-      return false;
-    }
-    if (isFutureDate(selectedDateKey)) {
-      showWarning('Cannot modify future dates.');
-      return false;
-    }
+    if (!selectedDateKey) { showWarning('Select a weekday first, then choose a status.'); return false; }
+    if (isFutureDate(selectedDateKey)) { showWarning('Cannot modify future dates.'); return false; }
     const parts = selectedDateKey.split('-');
     const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
     if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || holidayMap.has(selectedDateKey)) {
@@ -1343,9 +1293,7 @@
     return true;
   }
 
-  /* ============================================================
-     SELECTOR BOUNDS
-  ============================================================ */
+  /* Selector bounds */
   function updateSelectorsBounds() {
     const yearSel = document.getElementById('yearSelect');
     const monthSel = document.getElementById('monthSelect');
@@ -1399,9 +1347,7 @@
     updateSelectorsBounds();
   }
 
-  /* ============================================================
-     INIT APP
-  ============================================================ */
+  /* Init app */
   function populateSelectors() {
     const monthSel = document.getElementById('monthSelect');
     const yearSel = document.getElementById('yearSelect');
@@ -1429,7 +1375,6 @@
     applyHolidaysForYear(currentYear);
     saveAllMarks();
 
-    /* Weekday headers — mark SAT/SUN */
     const weekHeader = document.getElementById('weekdayHeader');
     weekHeader.innerHTML = '';
     ['MON','TUE','WED','THU','FRI','SAT','SUN'].forEach((d, i) => {
@@ -1442,13 +1387,11 @@
     renderCalendar();
     renderCompactSummaryAndLegend();
 
-    /* Event listeners */
     document.getElementById('prevMonth').addEventListener('click', () => shiftMonth(-1));
     document.getElementById('nextMonth').addEventListener('click', () => shiftMonth(1));
     document.getElementById('monthSelect').addEventListener('change', loadFromSelectors);
     document.getElementById('yearSelect').addEventListener('change', loadFromSelectors);
 
-    /* FIX: no e.preventDefault() needed — these are buttons, not links */
     document.getElementById('setFW').addEventListener('click', () => applyStatusToSelected('FW'));
     document.getElementById('setFL').addEventListener('click', () => applyStatusToSelected('FL'));
     document.getElementById('setHL').addEventListener('click', () => applyStatusToSelected('HL'));
@@ -1463,9 +1406,7 @@
     deptInp.addEventListener('change', () => localStorage.setItem('emp_dept', deptInp.value));
   }
 
-  /* ============================================================
-     LOGIN FLOW
-  ============================================================ */
+  /* Login flow */
   let appInitialized = false;
   const loginOverlay = document.getElementById('loginOverlay');
   const appContainer = document.getElementById('appContainer');
@@ -1488,7 +1429,6 @@
       loginOverlay.style.display = 'none';
       appContainer.style.display = 'block';
     } else {
-      /* FIX: doesn't reveal the password in the error message */
       loginError.textContent = 'Incorrect access code. Please check your invite.';
     }
   });
