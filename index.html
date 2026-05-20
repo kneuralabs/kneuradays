@@ -97,11 +97,7 @@
     }
 
     /* Animations */
-    @keyframes fadeInScale {
-      0%   { opacity: 0; transform: scale(0.96) translateY(8px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    @keyframes fadeSlideUp {
+@keyframes fadeSlideUp {
       0%   { opacity: 0; transform: translateY(12px); }
       100% { opacity: 1; transform: translateY(0); }
     }
@@ -119,126 +115,10 @@
       100% { opacity: 1; transform: translateY(0); }
     }
 
-    .login-card { animation: fadeInScale 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
-    .app        { animation: fadeSlideUp 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; }
-
-    /* Login screen */
-    .login-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--white);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .login-card {
-      background: transparent;
-      text-align: left;
-      width: 100%;
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 0 var(--sp-6);
-    }
-
-    .login-mark {
-      margin-bottom: var(--sp-4);
-    }
-
-    .title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-wrap: wrap;
-      gap: var(--sp-4);
-      margin-bottom: var(--sp-3);
-    }
-
-    .login-card h1 {
-      font-size: var(--text-hero);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: var(--ink);
-      line-height: 1.0;
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-    }
-
-    .byline {
-      font-size: clamp(0.85rem, 4vw, 1.1rem);
-      font-weight: 300;
-      color: var(--ink-muted);
-      letter-spacing: -0.1px;
-      white-space: nowrap;
-    }
-
-    .login-sub {
-      font-size: clamp(0.8rem, 3.5vw, 1rem);
-      font-weight: 300;
-      color: var(--ink-faint);
-      margin-bottom: 2.5rem;
-    }
-
-    .login-form {
-      margin-top: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--sp-4);
-    }
-
-    .login-card input {
-      width: 280px;
-      max-width: 85%;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid var(--border);
-      padding: 0.6rem 0 0.4rem;
-      font-family: 'Inter', sans-serif;
-      font-variant-numeric: tabular-nums;
-      font-size: var(--text-md);
-      font-weight: 400;
-      color: var(--ink);
-      outline: none;
-      transition: border-color 0.2s ease;
-      border-radius: 0;
-      touch-action: manipulation;
-    }
-    .login-card input:focus { border-bottom-color: var(--ink); }
-
-    .login-card button {
-      background: var(--ink);
-      color: var(--white);
-      border: none;
-      padding: 0.65rem 1.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-family: 'Inter', sans-serif;
-      letter-spacing: 0.2px;
-      border-radius: var(--r-md);
-      transition: background 0.2s ease, transform 0.1s ease;
-      touch-action: manipulation;
-    }
-    .login-card button:hover  { background: var(--accent); transform: translateY(-1px); }
-    .login-card button:active { transform: scale(0.96); }
-
-    .login-error {
-      color: var(--danger);
-      font-size: var(--text-xs);
-      font-weight: 400;
-      min-height: 1.2rem;
-    }
-
-    .login-hint {
-      font-size: var(--text-xs);
-      color: #B0BAC5;
-      font-weight: 300;
-    }
+    .app { animation: fadeSlideUp 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; }
 
     /* App shell */
-    .app-container { display: none; }
+    .app-container { display: block; }
 
     .app {
       max-width: 1200px;
@@ -285,20 +165,6 @@
       margin-top: var(--sp-1);
     }
 
-    .logout-link {
-      background: none;
-      border: none;
-      font-size: var(--text-sm);
-      cursor: pointer;
-      padding: var(--sp-1) var(--sp-2);
-      color: var(--ink-muted);
-      text-decoration: underline;
-      font-weight: 400;
-      border-radius: var(--r-sm);
-      transition: color 0.2s, transform 0.2s;
-      touch-action: manipulation;
-    }
-    .logout-link:hover { color: var(--accent); transform: translateX(2px); }
 
     /* Employee + summary panel */
     .top-dual-panel {
@@ -777,7 +643,7 @@
     /* ── Print */
     @media print {
       .nav-group, .warning-slot, .submit-btn, .nav-btn,
-      select, .status-buttons-group, .logout-link, .how-to-use {
+      select, .status-buttons-group, .how-to-use {
         display: none !important;
       }
       .day-cell.selected { outline: none; }
@@ -787,32 +653,7 @@
 </head>
 <body>
 
-<!-- Login screen -->
-<div id="loginOverlay" class="login-overlay">
-  <div class="login-card">
-    <!-- K brand mark -->
-    <div class="login-mark">
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect width="44" height="44" rx="10" fill="#0D1B2A"/>
-        <rect x="6" y="0" width="4" height="44" rx="2" fill="#E8604C"/>
-        <text x="27" y="31" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="26" text-anchor="middle" fill="#FFFFFF">K</text>
-      </svg>
-    </div>
-    <div class="title-row">
-      <h1>Kneuradays</h1>
-      <span class="byline">by Kneuralabs</span>
-    </div>
-    <div class="login-sub">Track work, leave &amp; sick days across your 40h week.</div>
-    <div class="login-form">
-      <input type="text" id="magicInput" placeholder="access code" autocomplete="off" aria-label="Access code">
-      <button id="loginBtn" type="button">enter &rarr;</button>
-      <div id="loginError" class="login-error" role="alert" aria-live="polite"></div>
-      <div class="login-hint">Enter your access code to continue.</div>
-    </div>
-  </div>
-</div>
-
-<!-- Main app -->
+<!-- App -->
 <div id="appContainer" class="app-container">
 <div class="app" id="appRoot">
 
@@ -829,7 +670,6 @@
       </h1>
       <p>work &middot; leave &middot; sick leave &middot; public holidays &middot; 40h week</p>
     </div>
-    <button id="logoutBtn" class="logout-link" type="button">Sign out</button>
   </div>
 
   <!-- Employee fields + weekly summary -->
@@ -1406,35 +1246,7 @@
     deptInp.addEventListener('change', () => localStorage.setItem('emp_dept', deptInp.value));
   }
 
-  /* Login flow */
-  let appInitialized = false;
-  const loginOverlay = document.getElementById('loginOverlay');
-  const appContainer = document.getElementById('appContainer');
-  const loginBtn     = document.getElementById('loginBtn');
-  const magicInput   = document.getElementById('magicInput');
-  const loginError   = document.getElementById('loginError');
-  const logoutBtn    = document.getElementById('logoutBtn');
-
-  function logout() {
-    appContainer.style.display = 'none';
-    loginOverlay.style.display = 'flex';
-    magicInput.value = '';
-    loginError.textContent = '';
-    selectedDateKey = null;
-  }
-
-  loginBtn.addEventListener('click', () => {
-    if (magicInput.value.trim().toLowerCase() === 'hello') {
-      if (!appInitialized) { initApp(); appInitialized = true; }
-      loginOverlay.style.display = 'none';
-      appContainer.style.display = 'block';
-    } else {
-      loginError.textContent = 'Incorrect access code. Please check your invite.';
-    }
-  });
-
-  magicInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
-  if (logoutBtn) logoutBtn.addEventListener('click', logout);
+  initApp();
 </script>
 </body>
 </html>
