@@ -522,7 +522,7 @@
           <button class="nav-arrow" id="nextWeek">&#8250;</button>
           <div style="margin-left:auto;">
             <div class="week-total" id="weekTotal"></div>
-            <div class="mono ink3" style="font-size:12px;text-align:right;">/ 40h</div>
+            <div class="mono ink3" style="font-size:12px;text-align:right;" id="weekTarget">/ 40h</div>
           </div>
         </div>
         <div class="week-cols" id="weekCols"></div>
@@ -841,10 +841,11 @@ function getWeekHours(monday) {
   let total=0,workdays=0;
   for (let i=0;i<5;i++) {
     const k=fmtKey(addDays(monday,i));
-    total+=holidayMap.has(k)?0:(STATUS[marksStore.get(k)]?.hours??0);
+    if (holidayMap.has(k)) continue;   // holidays are locked at 0h and are not part of the weekly target
+    total+=STATUS[marksStore.get(k)]?.hours??0;
     workdays++;
   }
-  return {total,workdays};
+  return {total,workdays,expected:workdays*8};
 }
 
 function renderStats() {
@@ -856,7 +857,7 @@ function renderStats() {
   const R=24, circ=2*Math.PI*R;
   const mon=currentWeekMonday||getMonday(new Date());
   const wh=getWeekHours(mon);
-  const weekOk=wh.total>=wh.workdays*8-0.01;
+  const weekOk=wh.total>=wh.expected-0.01;
 
   document.getElementById('statsStrip').innerHTML=`
     <div class="stat-card">
@@ -879,8 +880,8 @@ function renderStats() {
         <div class="stat-label">This week &middot; pace</div>
         <div style="display:flex;align-items:baseline;gap:6px;margin-top:4px;">
           <span class="stat-value" style="color:${weekOk?'var(--ok)':'var(--warn)'};">${wh.total.toFixed(1)}h</span>
-          <span style="font-size:13px;color:var(--ink3);">/ ${wh.workdays*8}h</span>
-          <span class="chip ${weekOk?'ok':'warn'}" style="margin-left:auto;">${weekOk?'&#10003; on track':'-'+(wh.workdays*8-wh.total).toFixed(1)+'h'}</span>
+          <span style="font-size:13px;color:var(--ink3);">/ ${wh.expected}h</span>
+          <span class="chip ${weekOk?'ok':'warn'}" style="margin-left:auto;">${weekOk?'&#10003; on track':'-'+(wh.expected-wh.total).toFixed(1)+'h'}</span>
         </div>
         <div class="pace-bars" id="statPaceBars"></div>
       </div>
@@ -1018,7 +1019,7 @@ function renderPulse() {
 
   if (!focusedWeekDate) focusedWeekDate=fmtKey(new Date());
 
-  let totalH=0;
+  let totalH=0,expectedH=0;
   const cols=document.getElementById('weekCols');
   cols.innerHTML='';
   const dayLabels=['Mon','Tue','Wed','Thu','Fri'];
@@ -1027,6 +1028,7 @@ function renderPulse() {
     const d=addDays(mon,i);
     const k=fmtKey(d);
     const isPH=holidayMap.has(k);
+    if (!isPH) expectedH+=8;
     const st=isPH?null:marksStore.get(k);
     const h=isPH?0:(STATUS[st]?.hours??0);
     const fut=isFuture(k);
@@ -1064,7 +1066,9 @@ function renderPulse() {
 
   const wt=document.getElementById('weekTotal');
   wt.textContent=totalH.toFixed(1)+'h';
-  wt.className='week-total '+(totalH>=40?'ok':'warn');
+  wt.className='week-total '+(totalH>=expectedH-0.01?'ok':'warn');
+  const wtgt=document.getElementById('weekTarget');
+  if (wtgt) wtgt.textContent='/ '+expectedH+'h';
 
   const fl=document.getElementById('focusedDayLabel');
   if (focusedWeekDate) {
@@ -1086,7 +1090,7 @@ function renderYearStrip() {
   for (let w=0;w<52;w++) {
     const mon=addDays(firstMon,w*7);
     const wh=getWeekHours(mon);
-    const pct=wh.total/40;
+    const pct=wh.expected>0?wh.total/wh.expected:1;
     const isCurrentWeek=currentWeekMonday&&fmtKey(mon)===fmtKey(currentWeekMonday);
     const isFut=mon>new Date();
     const color=isFut?'var(--rule2)':(pct>=1?'var(--accent)':pct>=0.5?'var(--c-h)':'var(--rule)');
@@ -1137,14 +1141,14 @@ function renderPulseRail() {
     const wh=getWeekHours(ptr);
     const isFut=ptr>new Date();
     const isFocus=currentWeekMonday&&fmtKey(ptr)===fmtKey(currentWeekMonday);
-    const pct=wh.workdays>0?Math.min((wh.total/(wh.workdays*8))*100,100):0;
+    const pct=wh.expected>0?Math.min((wh.total/wh.expected)*100,100):100;
     const color=isFut?'var(--rule)':(pct>=100?'var(--ok)':'var(--warn)');
     const startS=wStart.toLocaleString('default',{month:'short',day:'numeric'});
     const endS=wEnd.toLocaleString('default',{month:'short',day:'numeric'});
     const row=document.createElement('div');
     row.className='pace-week-row';
     row.style.fontWeight=isFocus?'600':'400';
-    row.innerHTML=`<span class="pace-week-name">${startS}–${endS}</span><div class="pace-mini-track"><div class="pace-mini-fill" style="width:${pct}%;background:${color};"></div></div><span class="pace-week-hrs mono">${wh.total}/${wh.workdays*8}h</span>`;
+    row.innerHTML=`<span class="pace-week-name">${startS}–${endS}</span><div class="pace-mini-track"><div class="pace-mini-fill" style="width:${pct}%;background:${color};"></div></div><span class="pace-week-hrs mono">${wh.total}/${wh.expected}h</span>`;
     prr.appendChild(row);
     ptr=addDays(ptr,7);
   }
