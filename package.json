@@ -1,0 +1,12 @@
+{
+  "name": "kneuradays",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kneuradays work calendar",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1"
+  }
+}
