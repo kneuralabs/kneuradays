@@ -39,9 +39,9 @@ function buildDom() {
     })();
   `;
 
-  // Drop the external CDN bundle (no network in tests) and inline the local core
-  // module + bootstrap before the app script runs.
-  html = html.replace(/<script[^>]*html2pdf[^>]*><\/script>/, '');
+  // Inline the local core module + bootstrap before the app script runs.
+  // (jsdom's default resource loader never fetches external <script src>, so the
+  // html2pdf CDN tag is ignored without us touching it.)
   html = html.replace(
     '<script src="calendar-core.js"></script>',
     `<script>${boot}</script>\n<script>${core}</script>`
