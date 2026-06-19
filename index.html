@@ -641,12 +641,16 @@
   </svg>
 </button>
 
+<script src="calendar-core.js"></script>
 <script>
 /* ── Storage keys ── */
 const MARKS_KEY = 'workcal_marks_v6_blank_default';
 const NOTES_KEY = 'kneuradays_notes_v1';
 const THEME_KEY = 'kneuradays_theme';
 const VIEW_KEY  = 'kneuradays_view';
+
+/* ── Shared pure logic (single source of truth, unit-tested via calendar-core.js) ── */
+const { fmtKey, parseKey, addDays, getMonday, weekNumber, monthName, nthWeekday, lastMonday, computeHolidays } = KCore;
 
 /* ── Status definitions ── */
 const STATUS = {
@@ -690,68 +694,14 @@ function loadNotes() {
 }
 
 /* ── Holidays ── */
-function computeHolidays(year) {
-  const h = [];
-  const add = (ds, name) => h.push({ dateStr: ds, name });
-  add(`${year}-01-01`, "New Year's Day");
-  const mlk = nthWeekday(year,1,1,3); if (mlk) add(mlk,"MLK Day");
-  const pres = nthWeekday(year,1,2,3); if (pres) add(pres,"Presidents' Day");
-  const mem = lastMonday(year,5); if (mem) add(mem,"Memorial Day");
-  add(`${year}-06-19`,"Juneteenth");
-  add(`${year}-07-04`,"Independence Day");
-  const labor = nthWeekday(year,1,9,1); if (labor) add(labor,"Labor Day");
-  const col = nthWeekday(year,1,10,2); if (col) add(col,"Columbus Day");
-  add(`${year}-11-11`,"Veterans Day");
-  const thanks = nthWeekday(year,4,11,4);
-  if (thanks) {
-    add(thanks,"Thanksgiving");
-    const d = new Date(thanks); d.setDate(d.getDate()+1);
-    add(fmtKey(d),"Day after Thanksgiving");
-  }
-  add(`${year}-12-25`,"Christmas Day");
-  const diwMap = {2024:'2024-10-31',2025:'2025-10-20',2026:'2026-11-08',2027:'2027-10-28',2028:'2028-10-17',2029:'2029-11-05',2030:'2030-10-26'};
-  if (diwMap[year]) add(diwMap[year],"Diwali");
-  const seen = new Set(), u = [];
-  for (const x of h) { if (!seen.has(x.dateStr)) { seen.add(x.dateStr); u.push(x); } }
-  return u.slice(0,13);
-}
-function nthWeekday(year, dow, month, nth) {
-  let d = new Date(year, month-1, 1), count = 0;
-  while (d.getMonth() === month-1) {
-    if (d.getDay() === dow) { count++; if (count === nth) return fmtKey(d); }
-    d.setDate(d.getDate()+1);
-  }
-  return null;
-}
-function lastMonday(year, month) {
-  let d = new Date(year, month, 0);
-  while (d.getDay() !== 1) d.setDate(d.getDate()-1);
-  return fmtKey(d);
-}
 function applyHolidays(year) {
   holidayMap.clear();
   computeHolidays(year).forEach(h => { holidayMap.set(h.dateStr, h.name); marksStore.delete(h.dateStr); });
 }
 
-/* ── Date utils ── */
-function fmtKey(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function parseKey(k) { const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); }
+/* ── Date utils (fmtKey/parseKey/addDays/getMonday/weekNumber/monthName live in calendar-core.js) ── */
 function isFuture(k) { const t=new Date(); t.setHours(0,0,0,0); return parseKey(k)>t; }
 function isWeekend(k) { const d=parseKey(k).getDay(); return d===0||d===6; }
-function getMonday(d) {
-  const dt=new Date(d); const day=dt.getDay();
-  dt.setDate(dt.getDate()+(day===0?-6:1-day)); dt.setHours(0,0,0,0); return dt;
-}
-function weekNumber(d) {
-  const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
-  dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7));
-  const ys=new Date(Date.UTC(dt.getUTCFullYear(),0,1));
-  return Math.ceil((((dt-ys)/86400000)+1)/7);
-}
-function addDays(d, n) { const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-function monthName(m) { return new Date(2000,m,1).toLocaleString('default',{month:'long'}); }
 
 /* ── Leave utils ── */
 function leaveDaysUsed(year) {
@@ -837,16 +787,8 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 });
 
 /* ── Stats strip ── */
-function getWeekHours(monday) {
-  let total=0,workdays=0;
-  for (let i=0;i<5;i++) {
-    const k=fmtKey(addDays(monday,i));
-    if (holidayMap.has(k)) continue;   // holidays are locked at 0h and are not part of the weekly target
-    total+=STATUS[marksStore.get(k)]?.hours??0;
-    workdays++;
-  }
-  return {total,workdays,expected:workdays*8};
-}
+const STATUS_HOURS = Object.fromEntries(Object.entries(STATUS).map(([k,v])=>[k,v.hours]));
+function getWeekHours(monday) { return KCore.getWeekHours(monday, holidayMap, marksStore, STATUS_HOURS); }
 
 function renderStats() {
   const used=leaveDaysUsed(currentYear);
