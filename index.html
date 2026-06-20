@@ -86,6 +86,7 @@
       font-family: var(--font);
       color: var(--ink);
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     .shell {
@@ -431,6 +432,18 @@
       .dock-kbd { width: 30px; height: 30px; font-size: 13px; }
       .dock-esc { display: none; }
       .heatmap-squares { gap: 2px; }
+    }
+    @media (max-width: 380px) {
+      .shell { padding: 8px 8px 96px; }
+      .day-cell { min-height: 46px; }
+      .month-hours-strip { grid-template-columns: repeat(6, 1fr); }
+      .tab-btn { padding: 7px 6px; font-size: 11px; }
+    }
+    @media (orientation: landscape) and (max-height: 520px) {
+      .shell { padding: 8px 14px 84px; }
+      .hdr { padding: 8px 14px; margin-bottom: 8px; }
+      .dock { padding: 8px 14px; }
+      .stats-strip { grid-template-columns: repeat(3, 1fr); }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0ms !important; transition-duration: 0ms !important; }
