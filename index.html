@@ -555,7 +555,7 @@
           <div class="rail-title">Leave quota <span id="quotaYear"></span></div>
           <div style="display:flex;align-items:baseline;gap:4px;margin-top:4px;">
             <span style="font-size:26px;font-weight:700;font-feature-settings:'tnum';" id="quotaUsed"></span>
-            <span style="font-size:14px;color:var(--ink3);">/ 30 days</span>
+            <span style="font-size:14px;color:var(--ink3);" id="quotaCap">/ 30 days</span>
           </div>
           <div class="quota-bar-track">
             <div class="quota-bar-full" id="quotaBarFull"></div>
@@ -669,7 +669,7 @@ const THEME_KEY = 'kneuradays_theme';
 const VIEW_KEY  = 'kneuradays_view';
 
 /* ── Shared pure logic (single source of truth, unit-tested via calendar-core.js) ── */
-const { fmtKey, parseKey, addDays, getMonday, weekNumber, monthName, nthWeekday, lastMonday, computeHolidays } = KCore;
+const { fmtKey, parseKey, addDays, getMonday, weekNumber, monthName, nthWeekday, lastMonday, computeHolidays, leaveSummary, canAddLeave, LEAVE_CAP } = KCore;
 
 /* ── Status definitions ── */
 const STATUS = {
@@ -722,20 +722,7 @@ function applyHolidays(year) {
 function isFuture(k) { const t=new Date(); t.setHours(0,0,0,0); return parseKey(k)>t; }
 function isWeekend(k) { const d=parseKey(k).getDay(); return d===0||d===6; }
 
-/* ── Leave utils ── */
-function leaveDaysUsed(year) {
-  let t=0;
-  for (const [k,v] of marksStore) {
-    if (k.startsWith(String(year))) { if (v==='FL') t+=1; else if (v==='HL') t+=0.5; }
-  }
-  return t;
-}
-function leaveFullDays(year) { let n=0; for (const [k,v] of marksStore) if (k.startsWith(String(year))&&v==='FL') n++; return n; }
-function leaveHalfDays(year) { let n=0; for (const [k,v] of marksStore) if (k.startsWith(String(year))&&v==='HL') n++; return n; }
-function canAddLeave(year, status) {
-  const add = status==='FL'?1:status==='HL'?0.5:0;
-  return add===0 || leaveDaysUsed(year)+add<=30;
-}
+/* ── Leave utils (annual accounting + cap live in calendar-core.js: leaveSummary, canAddLeave, LEAVE_CAP) ── */
 function currentStreak() {
   let streak=0; let d=new Date(); d.setHours(0,0,0,0);
   if (!marksStore.get(fmtKey(d))) d.setDate(d.getDate()-1);
@@ -770,7 +757,7 @@ function applyStatus(dateKey, newStatus) {
   if (holidayMap.has(dateKey)) { showWarn('Public holidays cannot be modified.'); return false; }
   const year=parseInt(dateKey.slice(0,4),10);
   if (marksStore.get(dateKey)===newStatus) return false;
-  if (!canAddLeave(year,newStatus)) { showWarn(`Leave limit reached (${leaveDaysUsed(year).toFixed(1)}/30). Cannot add more.`); return false; }
+  if (!canAddLeave(marksStore,year,newStatus)) { showWarn(`Leave limit reached (${leaveSummary(marksStore,year).used.toFixed(1)}/${LEAVE_CAP}). Cannot add more.`); return false; }
   marksStore.set(dateKey,newStatus); saveMarks(); clearWarn(); return true;
 }
 function applyStatusToSelection(newStatus) {
@@ -810,11 +797,10 @@ const STATUS_HOURS = Object.fromEntries(Object.entries(STATUS).map(([k,v])=>[k,v
 function getWeekHours(monday) { return KCore.getWeekHours(monday, holidayMap, marksStore, STATUS_HOURS); }
 
 function renderStats() {
-  const used=leaveDaysUsed(currentYear);
-  const remaining=(30-used).toFixed(1);
+  const {used,remaining}=leaveSummary(marksStore,currentYear);
   const streak=currentStreak();
   const yth=ytdHours();
-  const pct=used/30;
+  const pct=used/LEAVE_CAP;
   const R=24, circ=2*Math.PI*R;
   const mon=currentWeekMonday||getMonday(new Date());
   const wh=getWeekHours(mon);
@@ -832,8 +818,8 @@ function renderStats() {
       </div>
       <div>
         <div class="stat-label">Leave used &middot; ${currentYear}</div>
-        <div class="stat-value" style="font-size:18px;">${used.toFixed(1)} <span style="font-size:12px;color:var(--ink3);font-weight:400;">/ 30</span></div>
-        <div class="stat-sub">${remaining} days left</div>
+        <div class="stat-value" style="font-size:18px;">${used.toFixed(1)} <span style="font-size:12px;color:var(--ink3);font-weight:400;">/ ${LEAVE_CAP}</span></div>
+        <div class="stat-sub">${remaining.toFixed(1)} days left</div>
       </div>
     </div>
     <div class="stat-card">
@@ -1068,23 +1054,23 @@ function renderYearStrip() {
 
 function renderPulseRail() {
   const year=currentYear;
-  const used=leaveDaysUsed(year);
-  const full=leaveFullDays(year);
-  const half=leaveHalfDays(year);
+  const {full,half,used,remaining}=leaveSummary(marksStore,year);
   const ql=document.getElementById('quotaLeft');
   const qu=document.getElementById('quotaUsed');
   const qy=document.getElementById('quotaYear');
   if (qu) qu.textContent=used.toFixed(1);
   if (qy) qy.textContent=year;
+  const qc=document.getElementById('quotaCap');
+  if (qc) qc.textContent=`/ ${LEAVE_CAP} days`;
   const qbf=document.getElementById('quotaBarFull');
-  if (qbf) qbf.style.width=(full/30)*100+'%';
+  if (qbf) qbf.style.width=(full/LEAVE_CAP)*100+'%';
   const qbh=document.getElementById('quotaBarHalf');
-  if (qbh) qbh.style.width=((half*0.5)/30)*100+'%';
+  if (qbh) qbh.style.width=((half*0.5)/LEAVE_CAP)*100+'%';
   const qfd=document.getElementById('quotaFullDays');
   if (qfd) qfd.textContent=full;
   const qhd=document.getElementById('quotaHalfDays');
   if (qhd) qhd.textContent=`${half} (\xd70.5)`;
-  if (ql) ql.textContent=(30-used).toFixed(1)+' left';
+  if (ql) ql.textContent=remaining.toFixed(1)+' left';
 
   const prt=document.getElementById('paceRailTitle');
   if (prt) prt.textContent=`${monthName(currentMonth)} · weekly pace`;
@@ -1121,7 +1107,7 @@ function renderConstellation() {
   renderHeatmap();
 }
 function renderConstellationStats() {
-  const used=leaveDaysUsed(currentYear);
+  const {used}=leaveSummary(marksStore,currentYear);
   const streak=currentStreak();
   const yth=ytdHours();
   let logged=0;
@@ -1135,7 +1121,7 @@ function renderConstellationStats() {
     }
   }
   document.getElementById('constellationStats').innerHTML=[
-    {k:'Leave used',v:used.toFixed(1),sub:'/ 30 days',color:'var(--accent)',bar:used/30},
+    {k:'Leave used',v:used.toFixed(1),sub:`/ ${LEAVE_CAP} days`,color:'var(--accent)',bar:used/LEAVE_CAP},
     {k:'Workdays logged',v:String(logged),sub:`/ ${totalWd}`,color:'var(--ok)',bar:logged/totalWd},
     {k:'Current streak',v:String(streak),sub:'workdays',color:'var(--ink)',bar:null},
     {k:'YTD hours',v:yth.toLocaleString(),sub:'h logged',color:'var(--ink)',bar:null},
