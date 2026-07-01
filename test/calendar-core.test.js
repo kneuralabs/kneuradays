@@ -83,3 +83,46 @@ test('US fixed/floating holidays land on the right weekday for 2026', () => {
   assert.equal(C.lastMonday(2026, 5), '2026-05-25');
   assert.equal(C.nthWeekday(2026, 1, 9, 1), '2026-09-07');
 });
+
+// Leave accounting: full-leave (FL) draws 1 day, half-leave (HL) 0.5; work (FW)
+// and sick (SL) never touch the allowance. These were untested DOM-blob helpers
+// until they moved into the core — the annual cap is a real business rule.
+test('leaveSummary tallies full/half leave and computes the annual balance', () => {
+  const marks = new Map([
+    ['2026-01-05', 'FL'], // full
+    ['2026-02-10', 'FL'], // full
+    ['2026-03-03', 'HL'], // half
+    ['2026-04-01', 'FW'], // work — ignored
+    ['2026-05-01', 'SL'], // sick — ignored
+    ['2025-01-05', 'FL'], // different year — ignored
+  ]);
+  const s = C.leaveSummary(marks, 2026);
+  assert.equal(s.full, 2);
+  assert.equal(s.half, 1);
+  assert.equal(s.used, 2.5);
+  assert.equal(s.cap, C.LEAVE_CAP);
+  assert.equal(s.remaining, C.LEAVE_CAP - 2.5);
+});
+
+test('canAddLeave enforces the annual cap and ignores non-leave statuses', () => {
+  const marks = new Map();
+  for (let i = 0; i < C.LEAVE_CAP; i++) {
+    marks.set(C.fmtKey(new Date(2026, 0, 1 + i)), 'FL'); // fill the year to the cap
+  }
+  assert.equal(C.leaveSummary(marks, 2026).used, C.LEAVE_CAP);
+  assert.equal(C.canAddLeave(marks, 2026, 'FL'), false, 'cannot exceed the cap');
+  assert.equal(C.canAddLeave(marks, 2026, 'HL'), false, 'half day also blocked at the cap');
+  assert.equal(C.canAddLeave(marks, 2026, 'FW'), true, 'work never draws leave');
+  assert.equal(C.canAddLeave(marks, 2026, 'SL'), true, 'sick never draws leave');
+});
+
+test('canAddLeave allows a half day when exactly 0.5 of headroom remains', () => {
+  const marks = new Map();
+  for (let i = 0; i < C.LEAVE_CAP - 1; i++) {
+    marks.set(C.fmtKey(new Date(2026, 0, 1 + i)), 'FL'); // 29 full days
+  }
+  marks.set(C.fmtKey(new Date(2026, 5, 1)), 'HL'); // + half → used = 29.5
+  assert.equal(C.leaveSummary(marks, 2026).used, C.LEAVE_CAP - 0.5);
+  assert.equal(C.canAddLeave(marks, 2026, 'HL'), true, 'half day fits the last 0.5');
+  assert.equal(C.canAddLeave(marks, 2026, 'FL'), false, 'full day does not');
+});

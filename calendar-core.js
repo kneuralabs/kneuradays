@@ -87,6 +87,30 @@
     return { total, workdays, expected: workdays * 8 };
   }
 
+  /* Annual paid-leave accounting. A full-leave day (FL) draws 1 day, a half-leave
+     day (HL) draws 0.5; work (FW) and sick (SL) don't count against the allowance.
+     LEAVE_CAP is the single business rule for the yearly limit — one named constant
+     instead of a bare `30` sprinkled across the render code, so the cap enforced by
+     canAddLeave can never silently drift from the cap the UI displays.
+       marks – Map<dateKey, statusCode> (dateKey is 'YYYY-MM-DD') */
+  const LEAVE_CAP = 30;
+  function leaveSummary(marks, year) {
+    const prefix = String(year);
+    let full = 0, half = 0;
+    for (const [k, v] of marks) {
+      if (!k.startsWith(prefix)) continue;
+      if (v === 'FL') full++;
+      else if (v === 'HL') half++;
+    }
+    const used = full + half * 0.5;
+    return { full, half, used, cap: LEAVE_CAP, remaining: LEAVE_CAP - used };
+  }
+  function canAddLeave(marks, year, status) {
+    const add = status === 'FL' ? 1 : status === 'HL' ? 0.5 : 0;
+    return add === 0 || leaveSummary(marks, year).used + add <= LEAVE_CAP;
+  }
+
   return { fmtKey, parseKey, addDays, getMonday, weekNumber, monthName,
-           nthWeekday, lastMonday, computeHolidays, getWeekHours };
+           nthWeekday, lastMonday, computeHolidays, getWeekHours,
+           LEAVE_CAP, leaveSummary, canAddLeave };
 });
